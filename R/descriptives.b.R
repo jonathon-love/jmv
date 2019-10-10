@@ -133,6 +133,24 @@ descriptivesClass <- R6::R6Class(
 
             colArgs <- private$colArgs
 
+            nCols <- 0
+
+            for (i in seq_along(colArgs$name)) {
+                if (length(splitBy) > 0) {
+                    for (j in 1:nrow(grid)) {
+                        nCols <- nCols + 1
+                        nCols <- nCols + ncol(grid)
+                        nCols <- nCols + length(vars)
+                    }
+
+                } else {
+                    nCols <- nCols + 1
+                    nCols <- nCols + length(vars)
+                }
+            }
+
+            table$preallocateColumns(nCols)
+
             for (i in seq_along(colArgs$name)) {
 
                 name <- colArgs$name[i]
@@ -146,10 +164,10 @@ descriptivesClass <- R6::R6Class(
                     for (j in 1:nrow(grid)) {
 
                         post <- paste0("[", name, paste0(grid[j,], collapse = ""), "]")
-                        table$addColumn(name=paste0("stat", post), title="", type="text", value=title, visible=visible, combineBelow=TRUE)
+                        column <- table$addColumn(name=paste0("stat", post), title="", type="text", value=title, visible=visible, combineBelow=TRUE)
 
                         if (j == 1)
-                            table$addFormat(rowNo=1, col=paste0("stat", post), Cell.BEGIN_GROUP)
+                            column$getCell(1)$addFormat(Cell.BEGIN_GROUP)
 
                         for (k in 1:ncol(grid)) {
                             table$addColumn(name=paste0("var", k,  post), title=splitBy[k], type="text", value=grid[j,k], visible=visible, combineBelow=TRUE)
